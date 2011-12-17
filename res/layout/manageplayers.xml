@@ -2,7 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="right"
     android:orientation="vertical" >
 
     <LinearLayout
@@ -10,13 +9,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal" >
-
+
         <EditText
             android:id="@+id/inputPlayerName"
-            android:layout_width="10dp"
+            android:layout_width="205dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.34"
-            android:hint="@string/add_player_hint" >
+            android:layout_weight="0.70" android:hint="@string/add_player_hint">
 
             <requestFocus />
         </EditText>
@@ -27,18 +25,11 @@
             android:layout_height="wrap_content"
             android:text="@string/add" />
     </LinearLayout>
-
+
     <ListView
         android:id="@+id/lvPlayers"
         android:layout_width="match_parent"
-        android:layout_height="398dp" >
-
+        android:layout_height="wrap_content" >
     </ListView>
-
-    <Button
-        android:id="@+id/btnPlay"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/play" />
 
 </LinearLayout>
