@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import at.yoerg.util.CollectionUtil;
@@ -39,15 +40,26 @@ public class FieldManager {
 			throw new IllegalArgumentException("fieldCount has to be greater than 0");
 		}
 		List<Field> randomFields = new ArrayList<Field>();
+		Field[] fieldArray = (Field[])registeredFields.toArray();
 		
 		for(int i = 0; i < fieldCount; i++) {
-			randomFields.add(getRandomField());
+			randomFields.add(getRandomField(fieldArray));
 		}
 		
 		return randomFields;
 	}
 	
-	private Field getRandomField() {
-		
+	private Field getRandomField(Field[] fieldArray) {
+		Random rand = new Random();
+		int fieldsSize = fieldArray.length;
+		int randomOffset = rand.nextInt(fieldsSize - 1);
+		return fieldArray[randomOffset];	
+	}
+	
+	public void registerField(Field field) {
+		if(field == null) {
+			throw new NullPointerException();
+		}
+		registeredFields.add(field);
 	}
 }

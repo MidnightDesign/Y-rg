@@ -12,12 +12,12 @@ public enum BoardFactory {
 	}
 	
 	public Board createRandomBoard(int fieldCount) {
-		
+		return createBoard(FieldManager.getInstance().getRandomFields(fieldCount));
 	}
 	
 	public Board createBoard(List<Field> fields) {
 		Board board = new Board();
-		
+		board.setFields(fields);
 		return board;
 	}
 }

@@ -3,6 +3,8 @@ package at.yoerg.businesslogic.game;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 
@@ -76,8 +78,34 @@ public class Game implements Serializable {
 		return CollectionUtil.copy(getPlayers().keySet());
 	}
 	
-	public Turn nextTurn() {
+	public Turn nextTurn(int pips) {
 		
+	}
+	
+	// returns the next player in line
+	private Player getNextPlayer() {
+		if(getPlayers().size() == 0) {
+			throw new IllegalStateException("no players added to game");
+		}
+		// if no turns have been played return the first player in line
+		if(getTurns().size() == 0) {
+			return getPlayers().firstKey();
+		}
+		Player lastPlayer = getTurns().last().getPlayer();
+		Iterator<Player> it = getPlayers().keySet().iterator();
+		Player current = null;
+		while(it.hasNext()) {
+			current = it.next();
+			if(lastPlayer.equals(current)) {
+				if(it.hasNext()) {
+					current = it.next();
+				} else {
+					current = getPlayers().firstKey();
+				}
+				break;
+			}
+		}
+		return current;
 	}
 	
 	// returns copy of the turn set
