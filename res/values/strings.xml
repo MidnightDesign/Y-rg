@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <string name="hello">Hello World, Main!</string>
     <string name="app_name">Yoerg</string>
+    <string name="add">Add</string>
+    <string name="add_player_hint">Add player...</string>
+    <string-array name="main_menu_options">
+        <item>Play</item>
+    </string-array>
+        <string name="play">Play</string>
 
 </resources>
