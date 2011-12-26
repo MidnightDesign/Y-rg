@@ -81,6 +81,10 @@ public class Game implements Serializable {
 		return true;
 	}
 	
+	public int getNumberOfPlayers() {
+		return getPlayers().size();
+	}
+	
 	// returns a copy of the players set
 	public Collection<Player> getAllPlayers() {
 		return CollectionUtil.copy(getPlayers().keySet());
