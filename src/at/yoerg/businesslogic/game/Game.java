@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 
@@ -29,7 +28,8 @@ public class Game implements Serializable {
 	private Date finished;
 	
 	// create instances of Game through GameFactory
-	protected Game() {		
+	protected Game() {
+		
 	}
 	
 	public void start() {
@@ -54,9 +54,9 @@ public class Game implements Serializable {
 			throw new NullPointerException();
 		}
 		try {
-			players.put(player, 0);
+			players.put(player, players.size());
 		} catch (IllegalArgumentException iae) {
-			return false;
+			iae.printStackTrace();
 		}
 		return true;
 	}
@@ -79,7 +79,8 @@ public class Game implements Serializable {
 	}
 	
 	public Turn nextTurn(int pips) {
-		
+		// just a shortcut; needs to be properly implemented
+		return new Turn();
 	}
 	
 	// returns the next player in line
