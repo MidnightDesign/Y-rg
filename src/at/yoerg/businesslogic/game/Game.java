@@ -2,6 +2,7 @@ package at.yoerg.businesslogic.game;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.SortedMap;
@@ -10,9 +11,11 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import at.yoerg.businesslogic.board.Board;
+import at.yoerg.businesslogic.board.Field;
 import at.yoerg.businesslogic.card.rulecard.RuleCardManager;
 import at.yoerg.businesslogic.player.Player;
 import at.yoerg.util.CollectionUtil;
+import at.yoerg.util.comparator.AppendToTailComperator;
 
 
 public class Game implements Serializable {
@@ -66,7 +69,7 @@ public class Game implements Serializable {
 	
 	public boolean removePlayer(Player player) {
 		if(player == null) {
-			throw new NullPointerException();
+			throw new NullPointerException("player is null");
 		}
 		
 		Integer position = getPlayers().remove(player);
@@ -85,13 +88,11 @@ public class Game implements Serializable {
 		if(!validatePips(pips)) {
 			throw new IllegalArgumentException("pips not valid. must be between 1 and 6.");
 		}
-		if(board == null) {
-			throw new IllegalStateException("no board initialised");
-		}
 		
 		// gets the nex player in line
 		Player p = getNextPlayer();
-		Integer playerPosition = getPlayers().get(p);
+		// get next field for player
+		Field f = getNextFieldForPlayer(p);
 		
 		Turn t = new Turn();
 		
@@ -103,6 +104,23 @@ public class Game implements Serializable {
 			return false;
 		}
 		return true;
+	}
+	
+	private Field getNextFieldForPlayer(Player player) throws IllegalStateException, IllegalArgumentException, NullPointerException {
+		if(player == null) {
+			throw new NullPointerException("player can not be null");
+		}
+		if(board == null) {
+			throw new IllegalStateException("no board initialised");
+		}
+		
+		Integer playerPosition = getPlayers().get(player);
+		if(playerPosition == null) {
+			throw new IllegalArgumentException("player not in player list");
+		}
+		
+		Field f = null;
+		Field[] fieldArray = CollectionUtil.asArray(getBoard().getAllFields());
 	}
 	
 	// returns the next player in line
@@ -148,7 +166,7 @@ public class Game implements Serializable {
 
 	protected SortedMap<Player, Integer> getPlayers() {
 		if(players == null) {
-			players = new TreeMap<Player, Integer>();
+			players = new TreeMap<Player, Integer>(new AppendToTailComperator<Player>());
 		}
 		return players;
 	}
@@ -175,7 +193,7 @@ public class Game implements Serializable {
 
 	protected SortedSet<Turn> getTurns() {
 		if(turns == null) {
-			turns = new TreeSet<Turn>();
+			turns = new TreeSet<Turn>(new AppendToTailComperator<Turn>());
 		}
 		return turns;
 	}
