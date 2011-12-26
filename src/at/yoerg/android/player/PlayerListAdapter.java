@@ -9,18 +9,18 @@ import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 import at.yoerg.businesslogic.game.Game;
-import at.yoerg.businesslogic.player.Player;
+import at.yoerg.businesslogic.player.Person;
 
 public class PlayerListAdapter implements ListAdapter {
 	
 	private Game game;
 	private Context ctx;
-	private HashMap<Player, View> players;
+	private HashMap<Person, View> players;
 	
 	public PlayerListAdapter(Game game, Context ctx) {
 		this.game = game;
 		this.ctx = ctx;
-		players = new HashMap<Player, View>();
+		players = new HashMap<Person, View>();
 	}
 
 	@Override
@@ -88,16 +88,16 @@ public class PlayerListAdapter implements ListAdapter {
 		return true;
 	}
 	
-	private Player[] getPlayerArray() {
-		return game.getAllPlayers().toArray(new Player[0]);
+	private Person[] getPlayerArray() {
+		return game.getAllPlayers().toArray(new Person[0]);
 	}
 	
-	private Player getPlayerAt(int position) {
+	private Person getPlayerAt(int position) {
 		return getPlayerArray()[position];
 	}
 	
 	private View getEntry(int position) {
-		Player p = getPlayerAt(position);
+		Person p = getPlayerAt(position);
 		if(!players.containsKey(p)) {
 			players.put(p, new TextView(ctx));
 		}
