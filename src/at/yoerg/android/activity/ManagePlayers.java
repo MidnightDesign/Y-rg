@@ -40,6 +40,13 @@ public class ManagePlayers extends Activity implements OnClickListener {
 	private void addPlayer(String name) {
 		Person player = Person.create(name);
 		game.addPlayer(player);
+		refreshList();
+	}
+	
+	private void refreshList() {
+		ListView playerList = (ListView) findViewById(R.id.lvPlayers);
+		PlayerListAdapter adapter = (PlayerListAdapter) playerList.getAdapter();
+		adapter.notifyDataSetChanged();
 	}
 
 }

@@ -6,21 +6,20 @@ import android.content.Context;
 import android.database.DataSetObserver;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListAdapter;
-import android.widget.TextView;
+import android.widget.BaseAdapter;
 import at.yoerg.businesslogic.game.Game;
-import at.yoerg.businesslogic.player.Person;
+import at.yoerg.businesslogic.player.Player;
 
-public class PlayerListAdapter implements ListAdapter {
+public class PlayerListAdapter extends BaseAdapter {
 	
 	private Game game;
 	private Context ctx;
-	private HashMap<Person, View> players;
+	private HashMap<Player, View> players;
 	
 	public PlayerListAdapter(Game game, Context ctx) {
 		this.game = game;
 		this.ctx = ctx;
-		players = new HashMap<Person, View>();
+		players = new HashMap<Player, View>();
 	}
 
 	@Override
@@ -67,18 +66,6 @@ public class PlayerListAdapter implements ListAdapter {
 	}
 
 	@Override
-	public void registerDataSetObserver(DataSetObserver observer) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void unregisterDataSetObserver(DataSetObserver observer) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public boolean areAllItemsEnabled() {
 		return true;
 	}
@@ -88,21 +75,20 @@ public class PlayerListAdapter implements ListAdapter {
 		return true;
 	}
 	
-	private Person[] getPlayerArray() {
-		return game.getAllPlayers().toArray(new Person[0]);
+	private Player[] getPlayerArray() {
+		return game.getAllPlayers().toArray(new Player[0]);
 	}
 	
-	private Person getPlayerAt(int position) {
+	private Player getPlayerAt(int position) {
 		return getPlayerArray()[position];
 	}
 	
 	private View getEntry(int position) {
-		Person p = getPlayerAt(position);
+		Player p = getPlayerAt(position);
 		if(!players.containsKey(p)) {
-			players.put(p, new TextView(ctx));
+			players.put(p, new PlayerListItem(ctx, p));
 		}
-		TextView v = (TextView) players.get(p);
-		v.setText(p.getName());
+		PlayerListItem v = (PlayerListItem) players.get(p);
 		return v;
 	}
 
