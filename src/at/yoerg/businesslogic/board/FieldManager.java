@@ -36,10 +36,16 @@ public class FieldManager {
 	}
 	
 	public List<Field> getRandomFields(int fieldCount) {
+		// This is a quick workaround to make the code below work
+//		List<Field> l = new ArrayList<Field>();
+//		l.add(new Field());
+//		return l;
+		
 		if(fieldCount < 1) {
 			throw new IllegalArgumentException("fieldCount has to be greater than 0");
 		}
 		List<Field> randomFields = new ArrayList<Field>();
+		// TODO the next line throws an exception
 		Field[] fieldArray = (Field[])registeredFields.toArray();
 		
 		for(int i = 0; i < fieldCount; i++) {

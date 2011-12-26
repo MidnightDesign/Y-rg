@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import at.yoerg.businesslogic.board.Board;
 import at.yoerg.businesslogic.board.BoardFactory;
 
 public class GameManager {
@@ -31,7 +32,9 @@ public class GameManager {
 	}
 	
 	public Game startNewGame() {
-		currentGame = GameFactory.getInstance().createGame(BoardFactory.INSTANCE.createRandomBoard(), false);
+		BoardFactory bf = BoardFactory.INSTANCE; 
+		Board board = bf.createRandomBoard();
+		currentGame = GameFactory.getInstance().createGame(board, false);
 		return currentGame;
 	}
 	
