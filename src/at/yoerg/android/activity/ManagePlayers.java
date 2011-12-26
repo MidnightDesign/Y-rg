@@ -26,7 +26,6 @@ public class ManagePlayers extends Activity implements OnClickListener {
 		EditText t = (EditText) findViewById(R.id.inputPlayerName);
 		Player player = Player.create(t.getText().toString());
 		GameManager.getInstance().getCurrentGame().addPlayer(player);
-		GameManager.getInstance().getCurrentGame();
 	}
 
 }

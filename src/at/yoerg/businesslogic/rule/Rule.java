@@ -1,5 +1,9 @@
 package at.yoerg.businesslogic.rule;
 
-public class Rule {
+public abstract class Rule<T> {
+	
+	public abstract RuleParameter<T> getParamObject();
+	
+	public abstract void execute(RuleParameter<T> param);
 
 }

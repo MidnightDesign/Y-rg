@@ -16,6 +16,11 @@ public class Board {
 	protected List<Field> getFields() {
 		return fields;
 	}
+	
+	// TODO return copied field
+	protected Field getField(int index) {
+		return fields.get(index);
+	}
 
 	protected void setFields(List<Field> fields) {
 		this.fields = fields;
