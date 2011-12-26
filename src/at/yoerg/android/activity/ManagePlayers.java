@@ -12,7 +12,7 @@ import at.yoerg.android.R;
 import at.yoerg.android.adapter.PlayerListAdapter;
 import at.yoerg.businesslogic.game.Game;
 import at.yoerg.businesslogic.game.GameManager;
-import at.yoerg.businesslogic.player.Player;
+import at.yoerg.businesslogic.player.Person;
 
 public class ManagePlayers extends Activity implements OnClickListener {
 	
@@ -38,7 +38,7 @@ public class ManagePlayers extends Activity implements OnClickListener {
 	}
 	
 	private void addPlayer(String name) {
-		Player player = Player.create(name);
+		Person player = Person.create(name);
 		game.addPlayer(player);
 	}
 

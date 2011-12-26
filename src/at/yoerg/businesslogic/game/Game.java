@@ -1,18 +1,19 @@
 package at.yoerg.businesslogic.game;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.SortedMap;
+import java.util.List;
 import java.util.SortedSet;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import at.yoerg.businesslogic.board.Board;
 import at.yoerg.businesslogic.board.Field;
 import at.yoerg.businesslogic.card.rulecard.RuleCardManager;
 import at.yoerg.businesslogic.exception.EndOfGameException;
+import at.yoerg.businesslogic.player.Person;
 import at.yoerg.businesslogic.player.Player;
 import at.yoerg.util.ArrayUtil;
 import at.yoerg.util.CollectionUtil;
@@ -27,17 +28,19 @@ public class Game implements Serializable {
 	private static final long serialVersionUID = 3509633604478116999L;
 	
 	private String id;
-	private SortedMap<Player,Integer> players;
+	private List<Player> players;
 	private RuleCardManager ruleCardManager;
-	private SortedSet<Turn> turns;
+	private List<Turn> turns;
 	private Board board;
 	private Date started;
 	private Date finished;
 	private Boolean finite;
 	
+	private int currentPlayerPosition;
+	
 	// create instances of Game through GameFactory
 	protected Game() {
-		
+		currentPlayerPosition = 0;
 	}
 	
 	public void start() {
@@ -57,28 +60,22 @@ public class Game implements Serializable {
 		this.setFinished(new Date());
 	}
 
-	public boolean addPlayer(Player player) {
-		if(player == null) {
+	public boolean addPlayer(Person person) {
+		if(person == null) {
 			throw new NullPointerException("player is null");
 		}
-		try {
-			getPlayers().put(player, getPlayers().size());
-		} catch (IllegalArgumentException iae) {
-			iae.printStackTrace();
+		Player p = Player.getPlayer(person, this);
+		if(getPlayers().contains(p)) {
+			return false;
 		}
-		return true;
+		return getPlayers().add(p);
 	}
 	
 	public boolean removePlayer(Player player) {
 		if(player == null) {
 			throw new NullPointerException("player is null");
 		}
-		
-		Integer position = getPlayers().remove(player);
-		if(position == null) {
-			return false;
-		}
-		return true;
+		return getPlayers().remove(player);
 	}
 	
 	public int getNumberOfPlayers() {
@@ -87,7 +84,7 @@ public class Game implements Serializable {
 	
 	// returns a copy of the players set
 	public Collection<Player> getAllPlayers() {
-		return CollectionUtil.copy(getPlayers().keySet());
+		return CollectionUtil.copy(getPlayers());
 	}
 	
 	public Turn nextTurn(int pips) throws IllegalArgumentException, IllegalStateException, EndOfGameException {
@@ -96,10 +93,10 @@ public class Game implements Serializable {
 		}
 		
 		// gets the nex player in line
-		Player p = getNextPlayer();
+//		Player p = getNextPlayer();
 		
 		// get next field for player
-		Field f = getNextFieldForPlayer(p, pips);
+//		Field f = getNextFieldForPlayer(p, pips);
 		
 		Turn t = new Turn();
 		
@@ -121,10 +118,7 @@ public class Game implements Serializable {
 			throw new IllegalStateException("no board initialised");
 		}
 		
-		Integer playerPosition = getPlayers().get(player);
-		if(playerPosition == null) {
-			throw new IllegalArgumentException("player not in player list");
-		}
+		Integer playerPosition = player.getPosition();
 		playerPosition = (playerPosition.equals(0)) ? -1 : playerPosition;
 		
 		Field f = null;
@@ -144,30 +138,30 @@ public class Game implements Serializable {
 	}
 	
 	// returns the next player in line
-	private Player getNextPlayer() throws IllegalStateException {
-		if(getPlayers().size() == 0) {
-			throw new IllegalStateException("no players added to game");
-		}
-		// if no turns have been played return the first player in line
-		if(getTurns().size() == 0) {
-			return getPlayers().firstKey();
-		}
-		Player lastPlayer = getTurns().last().getPlayer();
-		Iterator<Player> it = getPlayers().keySet().iterator();
-		Player current = null;
-		while(it.hasNext()) {
-			current = it.next();
-			if(lastPlayer.equals(current)) {
-				if(it.hasNext()) {
-					current = it.next();
-				} else {
-					current = getPlayers().firstKey();
-				}
-				break;
-			}
-		}
-		return current;
-	}
+//	private Player getNextPlayer() throws IllegalStateException {
+//		if(getPlayers().size() == 0) {
+//			throw new IllegalStateException("no players added to game");
+//		}
+//		// if no turns have been played return the first player in line
+//		if(getTurns().size() == 0) {
+//			return getPlayers().first();
+//		}
+//		Player lastPlayer = getTurns().last().getPlayer();
+//		Iterator<Player> it = getPlayers().iterator();
+//		Player current = null;
+//		while(it.hasNext()) {
+//			current = it.next();
+//			if(lastPlayer.equals(current)) {
+//				if(it.hasNext()) {
+//					current = it.next();
+//				} else {
+//					current = getPlayers().first();
+//				}
+//				break;
+//			}
+//		}
+//		return current;
+//	}
 	
 	// returns copy of the turn set
 	public Collection<Turn> getAllTurns() {
@@ -184,14 +178,14 @@ public class Game implements Serializable {
 		this.id = id;
 	}
 
-	protected SortedMap<Player, Integer> getPlayers() {
+	protected List<Player> getPlayers() {
 		if(players == null) {
-			players = new TreeMap<Player, Integer>(new AppendToTailComperator<Player>());
+			players = new ArrayList<Player>();
 		}
 		return players;
 	}
 
-	protected void setPlayers(SortedMap<Player, Integer> players) {
+	protected void setPlayers(List<Player> players) {
 		this.players = players;
 	}
 
@@ -211,14 +205,14 @@ public class Game implements Serializable {
 		this.board = board;
 	}
 
-	protected SortedSet<Turn> getTurns() {
+	protected List<Turn> getTurns() {
 		if(turns == null) {
-			turns = new TreeSet<Turn>(new AppendToTailComperator<Turn>());
+			turns = new ArrayList<Turn>();
 		}
 		return turns;
 	}
 
-	protected void setTurns(SortedSet<Turn> turns) {
+	protected void setTurns(List<Turn> turns) {
 		this.turns = turns;
 	}
 
@@ -245,5 +239,34 @@ public class Game implements Serializable {
 	protected void setFinite(Boolean finite) {
 		this.finite = finite;
 	}
-	
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		Game other = (Game) obj;
+		if (id == null) {
+			if (other.id != null) {
+				return false;
+			}
+		} else if (!id.equals(other.id)) {
+			return false;
+		}
+		return true;
+	}
 }
