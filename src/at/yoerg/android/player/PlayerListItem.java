@@ -1,7 +1,6 @@
 package at.yoerg.android.player;
 
 import android.content.Context;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import at.yoerg.android.R;
@@ -15,8 +14,9 @@ public class PlayerListItem extends LinearLayout {
 		TextView name = new TextView(context);
 		name.setText(p.getName());
 		
-		Button remove = new Button(context);
+		RemovePlayerButton remove = new RemovePlayerButton(context, p);
 		remove.setText(R.string.remove);
+		remove.setOnClickListener((OnClickListener) context);
 		
 		addView(name);
 		addView(remove);
