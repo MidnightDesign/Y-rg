@@ -1,19 +1,25 @@
 package at.yoerg.businesslogic.game;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import at.yoerg.businesslogic.board.BoardFactory;
+
 public class GameManager {
 	
+	private static final int DICE_COUNT = 1;
 	static private GameManager instance = null;
 	
 	private Game currentGame = null;
 	
+	private List<Die> dice;
+	
 	private GameManager() {
-		
+		dice = Die.createDice(DICE_COUNT);
 	}
 	
 	public Game getCurrentGame() {
-		if(currentGame == null) {
-			currentGame = new Game();
-		}
 		return currentGame;
 	}
 	
@@ -24,4 +30,49 @@ public class GameManager {
 		return instance;
 	}
 	
+	public Game startNewGame() {
+		currentGame = GameFactory.getInstance().createGame(BoardFactory.INSTANCE.createRandomBoard(), false);
+		return currentGame;
+	}
+	
+	public int rollTheDice() {
+		return Die.rollAll(dice);
+	}
+	
+	private static class Die {
+		
+		private static final Random random = new Random();
+		private int currentPips;
+		
+		public Die() {
+			currentPips = roll();
+		}
+		
+		public int roll() {
+			currentPips = random.nextInt(5) + 1;
+			return currentPips;
+		}
+		
+		private static int rollAll(List<Die> dice) {
+			if(dice == null) {
+				throw new NullPointerException("dice is null");
+			}
+			int pipsCount = 0;
+			for(Die d : dice) {
+				pipsCount += d.roll();
+			}
+			return pipsCount;
+		}
+		
+		public static List<Die> createDice(int amount) {
+			if(amount < 1) {
+				throw new IllegalArgumentException("amount must be greater than 0.");
+			}
+			List<Die> dice = new ArrayList<GameManager.Die>();
+			for(int i = 0; i < amount; i++) {
+				dice.add(new Die());
+			}
+			return dice;
+		}
+	}
 }

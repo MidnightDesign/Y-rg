@@ -14,6 +14,15 @@ public abstract class CollectionUtil {
 		return coll;
 	}
 	
+	public static int getCycledCollectionIndex(Collection<?> collection, int position) {
+		checkCollection(collection);
+		int collectionSize = collection.size();
+		if(position < 0) {
+			return getCycledCollectionIndex(collection, (position + collectionSize));
+		}
+		return (collectionSize > position) ? position : getCycledCollectionIndex(collection, (position - collectionSize));
+	}
+	
 	private static void checkCollection(Collection<?> collection) {
 		if(collection == null) {
 			throw new NullPointerException("collection can not be null.");

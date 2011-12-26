@@ -3,22 +3,17 @@ package at.yoerg.util;
 
 public abstract class ArrayUtil {
 
-	// position: 0 - (array-length - 1)
-	// offset: starting from position go right offset-times
-	public static <T> T getElementWithOffsetFromPosition(T[] array, int position, int offset) throws NullPointerException, IllegalArgumentException {
+	public static <T> T getElementWithNewPosition(T[] array, int newPosition) {
 		checkArray(array);
-		if(array.length < position) {
-			throw new IllegalArgumentException("position greater than array length.");
-		}
-		if(offset < 0) {
-			throw new IllegalArgumentException("offset must be positiv.");
+		
+		if(newPosition < 0) {
+			return getElementWithNewPosition(array, newPosition + array.length);
 		}
 		
-		int newPosition = position + offset;
 		if(array.length > newPosition) {
 			return array[newPosition];
 		}
-		return getElementWithOffsetFromPosition(array, 0, (newPosition - array.length));
+		return getElementWithNewPosition(array, (newPosition - array.length));
 	}
 	
 	public static <T> int getCycledPosition(T[] array, int position) throws NullPointerException {

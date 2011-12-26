@@ -1,13 +1,9 @@
 package at.yoerg.businesslogic.game;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import at.yoerg.businesslogic.board.Board;
 import at.yoerg.businesslogic.board.Field;
@@ -17,7 +13,6 @@ import at.yoerg.businesslogic.player.Person;
 import at.yoerg.businesslogic.player.Player;
 import at.yoerg.util.ArrayUtil;
 import at.yoerg.util.CollectionUtil;
-import at.yoerg.util.comparator.AppendToTailComperator;
 
 
 public class Game implements Serializable {
@@ -35,25 +30,20 @@ public class Game implements Serializable {
 	private Date started;
 	private Date finished;
 	private Boolean finite;
-	
-	private int currentPlayerPosition;
+	// should be initialised with -1 so that the first nextPlayer() returns the Player with index 0
+	private Integer currentPlayerPosition;
 	
 	// create instances of Game through GameFactory
 	protected Game() {
-		currentPlayerPosition = 0;
 	}
 	
 	public void start() {
-		if(started != null) {
-			throw new IllegalStateException("Game has already started");
-		}
+		checkIfGameHasStarted();
 		this.setStarted(new Date());
 	}
 	
 	public void finish() {
-		if(finished != null) {
-			throw new IllegalStateException("Game has alredy been finished");
-		}
+		checkIfGameHasFinished();
 		if(started == null) {
 			throw new IllegalStateException("Game has not started yet");
 		}
@@ -61,6 +51,7 @@ public class Game implements Serializable {
 	}
 
 	public boolean addPlayer(Person person) {
+		checkIfGameHasStarted();
 		if(person == null) {
 			throw new NullPointerException("player is null");
 		}
@@ -72,6 +63,7 @@ public class Game implements Serializable {
 	}
 	
 	public boolean removePlayer(Player player) {
+		checkIfGameHasFinished();
 		if(player == null) {
 			throw new NullPointerException("player is null");
 		}
@@ -88,17 +80,22 @@ public class Game implements Serializable {
 	}
 	
 	public Turn nextTurn(int pips) throws IllegalArgumentException, IllegalStateException, EndOfGameException {
+		checkIfGameHasFinished();
 		if(!validatePips(pips)) {
 			throw new IllegalArgumentException("pips not valid. must be between 1 and 6.");
 		}
 		
 		// gets the nex player in line
-//		Player p = getNextPlayer();
+		Player p = getNextPlayer();
 		
 		// get next field for player
-//		Field f = getNextFieldForPlayer(p, pips);
+		Field f = getNextFieldForPlayer(p, pips);
 		
+		// create new turn to return
 		Turn t = new Turn();
+		t.setField(f);
+		t.setPips(pips);
+		t.setPlayer(p);
 		
 		return t;
 	}
@@ -124,44 +121,44 @@ public class Game implements Serializable {
 		Field f = null;
 		Field[] fieldArray = getBoard().getAllFields().toArray(new Field[0]);
 
-		int newPlayerPosition = ArrayUtil.getCycledPosition(fieldArray, (playerPosition + pips));
+		// calculate new player position according to the finiteness of the game 
+		int newPlayerPosition = (getFinite()) ? (playerPosition + pips) : ArrayUtil.getCycledPosition(fieldArray, (playerPosition + pips));
 		
 		// for infinite games
 		if(!getFinite()) {
-			f = ArrayUtil.getElementWithOffsetFromPosition(fieldArray, playerPosition, pips);
-		} else if((playerPosition + pips) > fieldArray.length) {
+			f = ArrayUtil.getElementWithNewPosition(fieldArray, newPlayerPosition);
+		} else if(newPlayerPosition > fieldArray.length) {
+			setFinished(new Date());
 			throw new EndOfGameException(player);
 		} else {
-			
+			f = fieldArray[newPlayerPosition];
 		}
+		player.setPosition(newPlayerPosition);
 		return f;
 	}
 	
 	// returns the next player in line
-//	private Player getNextPlayer() throws IllegalStateException {
-//		if(getPlayers().size() == 0) {
-//			throw new IllegalStateException("no players added to game");
-//		}
-//		// if no turns have been played return the first player in line
-//		if(getTurns().size() == 0) {
-//			return getPlayers().first();
-//		}
-//		Player lastPlayer = getTurns().last().getPlayer();
-//		Iterator<Player> it = getPlayers().iterator();
-//		Player current = null;
-//		while(it.hasNext()) {
-//			current = it.next();
-//			if(lastPlayer.equals(current)) {
-//				if(it.hasNext()) {
-//					current = it.next();
-//				} else {
-//					current = getPlayers().first();
-//				}
-//				break;
-//			}
-//		}
-//		return current;
-//	}
+	private Player getNextPlayer() throws IllegalStateException {
+		if(getPlayers().size() == 0) {
+			throw new IllegalStateException("no players added to game");
+		}
+		int newPlayerPosition = CollectionUtil.getCycledCollectionIndex(getPlayers(), getCurrentPlayerPosition() + 1);
+		setCurrentPlayerPosition(newPlayerPosition);
+		Player next = getPlayers().get(newPlayerPosition); 
+		return next;
+	}
+	
+	private void checkIfGameHasStarted() {
+		if(getStarted() != null) {
+			throw new IllegalStateException("game has already started");
+		}
+	}
+	
+	private void checkIfGameHasFinished() {
+		if(getFinished() != null) {
+			throw new IllegalStateException("game has already been finished");
+		}
+	}
 	
 	// returns copy of the turn set
 	public Collection<Turn> getAllTurns() {
@@ -179,9 +176,6 @@ public class Game implements Serializable {
 	}
 
 	protected List<Player> getPlayers() {
-		if(players == null) {
-			players = new ArrayList<Player>();
-		}
 		return players;
 	}
 
@@ -206,9 +200,6 @@ public class Game implements Serializable {
 	}
 
 	protected List<Turn> getTurns() {
-		if(turns == null) {
-			turns = new ArrayList<Turn>();
-		}
 		return turns;
 	}
 
@@ -238,6 +229,14 @@ public class Game implements Serializable {
 	
 	protected void setFinite(Boolean finite) {
 		this.finite = finite;
+	}
+
+	protected Integer getCurrentPlayerPosition() {
+		return currentPlayerPosition;
+	}
+
+	protected void setCurrentPlayerPosition(Integer currentPlayerPosition) {
+		this.currentPlayerPosition = currentPlayerPosition;
 	}
 
 	@Override

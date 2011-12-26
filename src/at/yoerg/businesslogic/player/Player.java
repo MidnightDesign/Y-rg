@@ -12,6 +12,7 @@ public class Player {
 	private List<Sip> sips;
 	private Integer position;
 	private Game game;
+	private Boolean finishedGame;
 	
 	protected Player() {
 	}
@@ -26,6 +27,7 @@ public class Player {
 		p.setPosition(0);
 		p.setSips(new ArrayList<Sip>());
 		p.setGame(game);
+		p.setFinishedGame(false);
 		
 		return p;
 	}
@@ -45,12 +47,12 @@ public class Player {
 	protected void setSips(List<Sip> sips) {
 		this.sips = sips;
 	}
-
+	
 	public Integer getPosition() {
 		return position;
 	}
 
-	protected void setPosition(Integer position) {
+	public void setPosition(int position) {
 		this.position = position;
 	}
 
@@ -60,6 +62,14 @@ public class Player {
 
 	protected void setGame(Game game) {
 		this.game = game;
+	}
+
+	public Boolean getFinishedGame() {
+		return finishedGame;
+	}
+
+	protected void setFinishedGame(Boolean finishedGame) {
+		this.finishedGame = finishedGame;
 	}
 
 	@Override
