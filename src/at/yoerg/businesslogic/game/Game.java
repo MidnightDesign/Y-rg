@@ -6,11 +6,14 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.SortedMap;
 import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import at.yoerg.businesslogic.board.Board;
 import at.yoerg.businesslogic.card.rulecard.RuleCardManager;
 import at.yoerg.businesslogic.player.Player;
 import at.yoerg.util.CollectionUtil;
+
 
 public class Game implements Serializable {
 
@@ -51,10 +54,10 @@ public class Game implements Serializable {
 
 	public boolean addPlayer(Player player) {
 		if(player == null) {
-			throw new NullPointerException();
+			throw new NullPointerException("player is null");
 		}
 		try {
-			players.put(player, players.size());
+			getPlayers().put(player, getPlayers().size());
 		} catch (IllegalArgumentException iae) {
 			iae.printStackTrace();
 		}
@@ -66,7 +69,7 @@ public class Game implements Serializable {
 			throw new NullPointerException();
 		}
 		
-		Integer position = players.remove(player);
+		Integer position = getPlayers().remove(player);
 		if(position == null) {
 			return false;
 		}
@@ -78,13 +81,32 @@ public class Game implements Serializable {
 		return CollectionUtil.copy(getPlayers().keySet());
 	}
 	
-	public Turn nextTurn(int pips) {
-		// just a shortcut; needs to be properly implemented
-		return new Turn();
+	public Turn nextTurn(int pips) throws IllegalArgumentException, IllegalStateException {
+		if(!validatePips(pips)) {
+			throw new IllegalArgumentException("pips not valid. must be between 1 and 6.");
+		}
+		if(board == null) {
+			throw new IllegalStateException("no board initialised");
+		}
+		
+		// gets the nex player in line
+		Player p = getNextPlayer();
+		Integer playerPosition = getPlayers().get(p);
+		
+		Turn t = new Turn();
+		
+		return t;
+	}
+	
+	private boolean validatePips(int pips) {
+		if(pips < 1 || pips > 6) {
+			return false;
+		}
+		return true;
 	}
 	
 	// returns the next player in line
-	private Player getNextPlayer() {
+	private Player getNextPlayer() throws IllegalStateException {
 		if(getPlayers().size() == 0) {
 			throw new IllegalStateException("no players added to game");
 		}
@@ -125,6 +147,9 @@ public class Game implements Serializable {
 	}
 
 	protected SortedMap<Player, Integer> getPlayers() {
+		if(players == null) {
+			players = new TreeMap<Player, Integer>();
+		}
 		return players;
 	}
 
@@ -149,6 +174,9 @@ public class Game implements Serializable {
 	}
 
 	protected SortedSet<Turn> getTurns() {
+		if(turns == null) {
+			turns = new TreeSet<Turn>();
+		}
 		return turns;
 	}
 
