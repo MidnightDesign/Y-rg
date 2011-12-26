@@ -1,4 +1,4 @@
-package at.yoerg.android.adapter;
+package at.yoerg.android.player;
 
 import java.util.HashMap;
 

@@ -9,7 +9,7 @@ import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import at.yoerg.android.R;
-import at.yoerg.android.adapter.PlayerListAdapter;
+import at.yoerg.android.player.PlayerListAdapter;
 import at.yoerg.businesslogic.game.Game;
 import at.yoerg.businesslogic.game.GameManager;
 import at.yoerg.businesslogic.player.Player;

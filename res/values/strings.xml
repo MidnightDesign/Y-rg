@@ -7,5 +7,6 @@
         <item>Play</item>
     </string-array>
         <string name="play">Play</string>
+        <string name="remove">Remove</string>
 
 </resources>
