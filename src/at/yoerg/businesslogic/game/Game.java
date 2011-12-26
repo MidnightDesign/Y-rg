@@ -2,7 +2,6 @@ package at.yoerg.businesslogic.game;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.SortedMap;
@@ -13,7 +12,9 @@ import java.util.TreeSet;
 import at.yoerg.businesslogic.board.Board;
 import at.yoerg.businesslogic.board.Field;
 import at.yoerg.businesslogic.card.rulecard.RuleCardManager;
+import at.yoerg.businesslogic.exception.EndOfGameException;
 import at.yoerg.businesslogic.player.Player;
+import at.yoerg.util.ArrayUtil;
 import at.yoerg.util.CollectionUtil;
 import at.yoerg.util.comparator.AppendToTailComperator;
 
@@ -32,6 +33,7 @@ public class Game implements Serializable {
 	private Board board;
 	private Date started;
 	private Date finished;
+	private Boolean finite;
 	
 	// create instances of Game through GameFactory
 	protected Game() {
@@ -84,15 +86,16 @@ public class Game implements Serializable {
 		return CollectionUtil.copy(getPlayers().keySet());
 	}
 	
-	public Turn nextTurn(int pips) throws IllegalArgumentException, IllegalStateException {
+	public Turn nextTurn(int pips) throws IllegalArgumentException, IllegalStateException, EndOfGameException {
 		if(!validatePips(pips)) {
 			throw new IllegalArgumentException("pips not valid. must be between 1 and 6.");
 		}
 		
 		// gets the nex player in line
 		Player p = getNextPlayer();
+		
 		// get next field for player
-		Field f = getNextFieldForPlayer(p);
+		Field f = getNextFieldForPlayer(p, pips);
 		
 		Turn t = new Turn();
 		
@@ -106,7 +109,7 @@ public class Game implements Serializable {
 		return true;
 	}
 	
-	private Field getNextFieldForPlayer(Player player) throws IllegalStateException, IllegalArgumentException, NullPointerException {
+	private Field getNextFieldForPlayer(Player player, int pips) throws EndOfGameException, IllegalStateException, IllegalArgumentException, NullPointerException {
 		if(player == null) {
 			throw new NullPointerException("player can not be null");
 		}
@@ -118,9 +121,22 @@ public class Game implements Serializable {
 		if(playerPosition == null) {
 			throw new IllegalArgumentException("player not in player list");
 		}
+		playerPosition = (playerPosition.equals(0)) ? -1 : playerPosition;
 		
 		Field f = null;
-		Field[] fieldArray = CollectionUtil.asArray(getBoard().getAllFields());
+		Field[] fieldArray = getBoard().getAllFields().toArray(new Field[0]);
+
+		int newPlayerPosition = ArrayUtil.getCycledPosition(fieldArray, (playerPosition + pips));
+		
+		// for infinite games
+		if(!getFinite()) {
+			f = ArrayUtil.getElementWithOffsetFromPosition(fieldArray, playerPosition, pips);
+		} else if((playerPosition + pips) > fieldArray.length) {
+			throw new EndOfGameException(player);
+		} else {
+			
+		}
+		return f;
 	}
 	
 	// returns the next player in line
@@ -217,4 +233,13 @@ public class Game implements Serializable {
 	protected void setFinished(Date finished) {
 		this.finished = finished;
 	}
+	
+	public Boolean getFinite() {
+		return finite;
+	}
+	
+	protected void setFinite(Boolean finite) {
+		this.finite = finite;
+	}
+	
 }
