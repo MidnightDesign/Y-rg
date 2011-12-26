@@ -6,10 +6,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
 import at.yoerg.android.R;
-import at.yoerg.businesslogic.game.GameManager;
-import at.yoerg.businesslogic.game.drinkinggame.DrinkingGame;
-import at.yoerg.businesslogic.game.drinkinggame.drink.DrinkCategory;
-import at.yoerg.util.ArrayUtil;
 
 public class Main extends ListActivity {
     /** Called when the activity is first created. */

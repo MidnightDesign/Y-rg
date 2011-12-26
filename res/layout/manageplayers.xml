@@ -4,6 +4,12 @@
     android:layout_height="match_parent"
     android:gravity="right"
     android:orientation="vertical" >
+
+    <Button
+        android:id="@+id/btnPlay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/play" />
 
     <LinearLayout
         android:id="@+id/linearLayout1"
@@ -27,18 +33,12 @@
             android:layout_height="wrap_content"
             android:text="@string/add" />
     </LinearLayout>
-
+
     <ListView
         android:id="@+id/lvPlayers"
         android:layout_width="match_parent"
-        android:layout_height="398dp" >
+        android:layout_height="wrap_content" >
 
     </ListView>
-
-    <Button
-        android:id="@+id/btnPlay"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/play" />
 
 </LinearLayout>

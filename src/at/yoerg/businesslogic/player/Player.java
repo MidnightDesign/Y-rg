@@ -109,4 +109,8 @@ public class Player {
 		}
 		return true;
 	}
+
+	public String getName() {
+		return getPerson().getName();
+	}
 }
