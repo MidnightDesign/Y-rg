@@ -31,7 +31,9 @@ public final class R {
         public static final int add=0x7f040001;
         public static final int add_player_hint=0x7f040002;
         public static final int app_name=0x7f040000;
+        public static final int error_player_name_exists=0x7f040006;
         public static final int play=0x7f040003;
         public static final int remove=0x7f040004;
+        public static final int warning_too_few_players=0x7f040005;
     }
 }

@@ -26,7 +26,10 @@ public class ManagePlayers extends Activity implements OnClickListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		GameManager gm = GameManager.getInstance();
-		game = gm.startNewGame();
+		game = gm.getCurrentGame();
+		if(game == null) {
+			game = gm.startNewGame();
+		}
         setContentView(R.layout.manageplayers);
         
         Button b = (Button) findViewById(R.id.btnAdd);
