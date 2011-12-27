@@ -3,8 +3,10 @@ package at.yoerg.businesslogic.game;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
+import at.yoerg.android.activity.PlayerNameExistsException;
 import at.yoerg.businesslogic.board.Board;
 import at.yoerg.businesslogic.board.Field;
 import at.yoerg.businesslogic.card.rulecard.RuleCardManager;
@@ -50,8 +52,13 @@ public class Game implements Serializable {
 		this.setFinished(new Date());
 	}
 
-	public boolean addPlayer(Person person) {
+	@SuppressWarnings("unused")
+	public boolean addPlayer(Person person) throws PlayerNameExistsException {
 		checkIfGameHasStarted();
+		String playerName = person.getName();
+		if(playerNameExists(playerName)) {
+			throw new PlayerNameExistsException("A player with the name \"" + playerName + "\" already exists.");
+		}
 		if(person == null) {
 			throw new NullPointerException("player is null");
 		}
@@ -60,6 +67,21 @@ public class Game implements Serializable {
 			return false;
 		}
 		return getPlayers().add(p);
+	}
+	
+	private boolean playerNameExists(String name) {
+		Collection<Player> players = getAllPlayers();
+		Iterator<Player> iterator = players.iterator();
+		boolean result = false; 
+		while(iterator.hasNext()) {
+			String currentName = iterator.next().getName();
+			boolean x = currentName.equalsIgnoreCase(name);
+			if(x) {
+				result = true;
+				break;
+			}
+		}
+		return result;
 	}
 	
 	public boolean removePlayer(Player player) {

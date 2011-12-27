@@ -8,5 +8,7 @@
     </string-array>
         <string name="play">Play</string>
         <string name="remove">Remove</string>
+        <string name="warning_too_few_players">How is this supposed to work? You have to add at least two players, my friend.</string>
+        <string name="error_player_name_exists">Um.. you already added a player named %s.</string>
 
 </resources>
