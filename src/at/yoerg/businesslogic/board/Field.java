@@ -8,6 +8,14 @@ public class Field {
 	
 	private String title;
 	private List<Rule> rules;
+	
+	public Field() {
+		
+	}
+	
+	public Field(String title) {
+		setTitle(title);
+	}
 
 	public void setTitle(String title) {
 		this.title = title;

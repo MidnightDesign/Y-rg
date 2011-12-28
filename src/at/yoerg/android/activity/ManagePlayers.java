@@ -1,5 +1,7 @@
 package at.yoerg.android.activity;
 
+import java.util.Timer;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -40,6 +42,16 @@ public class ManagePlayers extends Activity implements OnClickListener {
 		ListView playerList = (ListView) findViewById(R.id.lvPlayers);
 		ListAdapter adapter = new PlayerListAdapter(game, this);
 		playerList.setAdapter(adapter);
+		
+		// For testing
+//		try {
+//			game.addPlayer(Person.create("Rudi"));
+//			game.addPlayer(Person.create("Christoph"));
+//			game.addPlayer(Person.create("Karli"));
+//		} catch (PlayerNameExistsException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 	
 	public void onClick(View v) {
@@ -87,6 +99,7 @@ public class ManagePlayers extends Activity implements OnClickListener {
 		int duration = Toast.LENGTH_LONG;
 		Toast toast = Toast.makeText(context, text, duration);
 		toast.show();
+		Timer t = new Timer();
 	}
 
 }
