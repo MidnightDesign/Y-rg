@@ -39,6 +39,10 @@ public class Player {
 	protected void setPerson(Person person) {
 		this.person = person;
 	}
+	
+	public void addSip(Sip sip) {
+		sips.add(sip);
+	}
 
 	public List<Sip> getSips() {
 		return sips;
