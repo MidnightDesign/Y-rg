@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import android.util.Log;
 import at.yoerg.businesslogic.board.Board;
 import at.yoerg.businesslogic.board.BoardFactory;
 
@@ -32,9 +33,14 @@ public class GameManager {
 	}
 	
 	public Game startNewGame() {
-		BoardFactory bf = BoardFactory.INSTANCE; 
-		Board board = bf.createRandomBoard();
-		currentGame = GameFactory.getInstance().createGame(board, false);
+		BoardFactory bf = BoardFactory.INSTANCE;
+		try {
+			Board board = bf.createRandomBoard();
+			currentGame = GameFactory.getInstance().createGame(board, false);
+		} catch(Exception e) {
+			//TODO: remove log
+			Log.d("christoph", "", e);
+		}
 		return currentGame;
 	}
 	

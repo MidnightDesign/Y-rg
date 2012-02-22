@@ -18,7 +18,7 @@ public abstract class ArrayUtil {
 	
 	public static <T> int getCycledPosition(T[] array, int position) throws NullPointerException {
 		checkArray(array);
-		return (array.length < position) ? position : getCycledPosition(array, (position - array.length));
+		return (position < array.length) ? position : getCycledPosition(array, (position - array.length));
 	}
 	
 	private static <T> void checkArray(T[] array) throws NullPointerException {

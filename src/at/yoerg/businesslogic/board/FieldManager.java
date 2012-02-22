@@ -4,11 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Random;
-import java.util.Set;
 
 import at.yoerg.businesslogic.rule.Rule;
 import at.yoerg.businesslogic.rule.drinkingRule.playerCenteredRule.AllPlayersDrinkingRule;
@@ -26,7 +24,7 @@ public class FieldManager {
 	private static final String PATH_TO_FIELD_TEXT = "at/yoerg/businesslogic/board/field_text_en.properties";
 	private static FieldManager instance = null;
 	
-	private Set<Field> registeredFields;
+	private List<Field> registeredFields;
 	
 	public static FieldManager getInstance() throws IOException {
 		if(instance == null) {
@@ -36,7 +34,7 @@ public class FieldManager {
 	}
 	
 	private FieldManager() throws IOException {
-		registeredFields = new HashSet<Field>();
+		registeredFields = new ArrayList<Field>();
 		init();
 	}
 	
@@ -221,20 +219,19 @@ public class FieldManager {
 			throw new IllegalArgumentException("fieldCount has to be greater than 0");
 		}
 		List<Field> randomFields = new ArrayList<Field>();
-		Field[] fieldArray = (Field[])registeredFields.toArray();
 		
 		for(int i = 0; i < fieldCount; i++) {
-			randomFields.add(getRandomField(fieldArray));
+			randomFields.add(getRandomField());
 		}
 		
 		return randomFields;
 	}
 	
-	private Field getRandomField(Field[] fieldArray) {
+	private Field getRandomField() {
 		Random rand = new Random();
-		int fieldsSize = fieldArray.length;
+		int fieldsSize = registeredFields.size();
 		int randomOffset = rand.nextInt(fieldsSize - 1);
-		return fieldArray[randomOffset];	
+		return registeredFields.get(randomOffset);	
 	}
 	
 	public void registerField(Field field) {

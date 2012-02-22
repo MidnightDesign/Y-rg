@@ -145,6 +145,9 @@ public class Play extends Activity implements OnClickListener {
 		next.setVisibility(View.VISIBLE);
 		Button roll = (Button) findViewById(R.id.btnRollDice);
 		roll.setVisibility(View.INVISIBLE);
+		
+		// finish turn
+		t.finish();
 	}
 	
 //	private Player getRandomPlayer() {

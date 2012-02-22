@@ -3,6 +3,8 @@ package at.yoerg.businesslogic.board;
 import java.io.IOException;
 import java.util.List;
 
+import android.util.Log;
+
 public enum BoardFactory {
 	INSTANCE;
 	
@@ -17,6 +19,8 @@ public enum BoardFactory {
 			return createBoard(FieldManager.getInstance().getRandomFields(fieldCount));
 		} catch (IOException e) {
 			e.printStackTrace();
+			//TODO: remove log
+			Log.d("christoph", "exception", e);
 		}
 		return null;
 	}

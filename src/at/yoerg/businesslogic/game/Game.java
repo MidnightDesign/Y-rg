@@ -362,7 +362,8 @@ public class Game implements Serializable {
 			}
 			game.validatePips(pips);
 			this.pips = pips;
-			field = game.getNextFieldForPlayer(player, pips);List<Rule> rules = field.getRules();
+			field = game.getNextFieldForPlayer(player, pips);
+			List<Rule> rules = field.getRules();
 			
 			// check if rules need user input or not
 			// if not, set required fields
