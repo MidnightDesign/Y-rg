@@ -11,8 +11,11 @@ import at.yoerg.businesslogic.board.Board;
 import at.yoerg.businesslogic.board.Field;
 import at.yoerg.businesslogic.card.rulecard.RuleCardManager;
 import at.yoerg.businesslogic.exception.EndOfGameException;
+import at.yoerg.businesslogic.game.drinkinggame.drink.Sip;
 import at.yoerg.businesslogic.player.Person;
 import at.yoerg.businesslogic.player.Player;
+import at.yoerg.businesslogic.rule.PlayerCenteredRule;
+import at.yoerg.businesslogic.rule.Rule;
 import at.yoerg.util.ArrayUtil;
 import at.yoerg.util.CollectionUtil;
 
@@ -24,6 +27,8 @@ public class Game implements Serializable {
 	 */
 	private static final long serialVersionUID = 3509633604478116999L;
 	
+	private static final int MIN_PLAYERS = 3;
+	
 	private String id;
 	private List<Player> players;
 	private RuleCardManager ruleCardManager;
@@ -34,6 +39,7 @@ public class Game implements Serializable {
 	private Boolean finite;
 	// should be initialised with -1 so that the first nextPlayer() returns the Player with index 0
 	private Integer currentPlayerPosition;
+	private Turn currentTurn;
 	
 	// create instances of Game through GameFactory
 	protected Game() {
@@ -41,6 +47,9 @@ public class Game implements Serializable {
 	
 	public void start() {
 		checkIfGameHasStarted();
+		if(players.size() < MIN_PLAYERS) {
+			throw new IllegalStateException("not enough players. at least " + MIN_PLAYERS + " are required.");
+		}
 		this.setStarted(new Date());
 	}
 	
@@ -52,15 +61,13 @@ public class Game implements Serializable {
 		this.setFinished(new Date());
 	}
 
-	@SuppressWarnings("unused")
 	public boolean addPlayer(Person person) throws PlayerNameExistsException {
-		checkIfGameHasStarted();
+		if(person == null) {
+			throw new NullPointerException("player is null");
+		}
 		String playerName = person.getName();
 		if(playerNameExists(playerName)) {
 			throw new PlayerNameExistsException("A player with the name \"" + playerName + "\" already exists.");
-		}
-		if(person == null) {
-			throw new NullPointerException("player is null");
 		}
 		Player p = Player.getPlayer(person, this);
 		if(getPlayers().contains(p)) {
@@ -71,21 +78,18 @@ public class Game implements Serializable {
 	
 	private boolean playerNameExists(String name) {
 		Collection<Player> players = getAllPlayers();
-		Iterator<Player> iterator = players.iterator();
-		boolean result = false; 
+		Iterator<Player> iterator = players.iterator(); 
 		while(iterator.hasNext()) {
 			String currentName = iterator.next().getName();
 			boolean x = currentName.equalsIgnoreCase(name);
 			if(x) {
-				result = true;
-				break;
+				return true;
 			}
 		}
-		return result;
+		return false;
 	}
 	
 	public boolean removePlayer(Player player) {
-		checkIfGameHasFinished();
 		if(player == null) {
 			throw new NullPointerException("player is null");
 		}
@@ -97,29 +101,37 @@ public class Game implements Serializable {
 	}
 	
 	// returns a copy of the players set
-	public Collection<Player> getAllPlayers() {
-		return CollectionUtil.copy(getPlayers());
+	public List<Player> getAllPlayers() {
+		return (List<Player>)CollectionUtil.copy(getPlayers());
 	}
 	
-	public Turn nextTurn(int pips) throws IllegalArgumentException, IllegalStateException, EndOfGameException {
+	// returns the next turn containing the next player
+	// throws IllegalStateException if game has not started or current turn has not been finished yet
+	public Turn nextTurn() throws IllegalStateException {
 		checkIfGameHasFinished();
-		if(!validatePips(pips)) {
-			throw new IllegalArgumentException("pips not valid. must be between 1 and 6.");
-		}
+		checkCurrentTurn();
 		
 		// gets the nex player in line
 		Player p = getNextPlayer();
 		
-		// get next field for player
-		Field f = getNextFieldForPlayer(p, pips);
-		
-		// create new turn to return
-		Turn t = new Turn();
-		t.setField(f);
-		t.setPips(pips);
-		t.setPlayer(p);
+		// creates the new turn for the player
+		Turn t = new Turn(p, this);
+		currentTurn = t;
 		
 		return t;
+	}
+	
+	private void checkCurrentTurn() {
+		if(currentTurn == null) {
+			return;
+		}
+		if(!currentTurn.played) {
+			throw new IllegalStateException("current turn has not been played yet.");
+		}
+	}
+	
+	public Turn getCurrentTurn() {
+		return currentTurn;
 	}
 	
 	private boolean validatePips(int pips) {
@@ -135,6 +147,9 @@ public class Game implements Serializable {
 		}
 		if(board == null) {
 			throw new IllegalStateException("no board initialised");
+		}
+		if(!validatePips(pips)) {
+			throw new IllegalArgumentException("pips must be between 1 and 6");
 		}
 		
 		Integer playerPosition = player.getPosition();
@@ -160,6 +175,7 @@ public class Game implements Serializable {
 	}
 	
 	// returns the next player in line
+	// if player has not played his turn the same player gets returned every time
 	private Player getNextPlayer() throws IllegalStateException {
 		if(getPlayers().size() == 0) {
 			throw new IllegalStateException("no players added to game");
@@ -168,6 +184,21 @@ public class Game implements Serializable {
 		setCurrentPlayerPosition(newPlayerPosition);
 		Player next = getPlayers().get(newPlayerPosition); 
 		return next;
+	}
+	
+	public void givePlayerSips(Player player, int sips) throws NullPointerException, IllegalArgumentException {
+		if(player == null) {
+			throw new NullPointerException("player can not be null");
+		}
+		if(!getPlayers().contains(player)) {
+			throw new IllegalArgumentException("provided player is not part of the game");
+		}
+		if(sips < 1) {
+			throw new IllegalArgumentException("sips must be greater than 0");
+		}
+		for(int i = 0; i < sips; i++) {
+			player.addSip(new Sip());
+		}
 	}
 	
 	private void checkIfGameHasStarted() {
@@ -289,5 +320,77 @@ public class Game implements Serializable {
 			return false;
 		}
 		return true;
+	}
+	
+	public static class Turn implements Serializable {
+		
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 8645924455142975915L;
+		
+		private Player player;
+		private Integer pips;
+		private Field field;
+		private Game game;
+		private Boolean played = false;
+		
+		protected Turn(Player player, Game game) {
+			setPlayer(player);
+			this.game = game;
+		}
+
+		public Player getPlayer() {
+			return player;
+		}
+
+		protected void setPlayer(Player player) {
+			this.player = player;
+		}
+
+		public Integer getPips() {
+			return pips;
+		}
+
+		protected void setPips(Integer pips) {
+			this.pips = pips;
+		}
+		
+		public Field getField(int pips) throws IllegalArgumentException, IllegalStateException, EndOfGameException {
+			if(field != null) {
+				return field;
+			}
+			game.validatePips(pips);
+			this.pips = pips;
+			field = game.getNextFieldForPlayer(player, pips);List<Rule> rules = field.getRules();
+			
+			// check if rules need user input or not
+			// if not, set required fields
+			for(Rule r : rules) {
+				if(r instanceof PlayerCenteredRule) {
+					((PlayerCenteredRule) r).setCurrentPlayer(player);
+					((PlayerCenteredRule) r).setAllPlayers(game.getAllPlayers());
+				}
+			}
+
+			return field;
+		}
+
+		protected Field getField() {
+			return field;
+		}
+
+		protected void setField(Field field) {
+			this.field = field;
+		}
+		
+		// finishes this turn
+		// throws IllegalStateException if no field is set and no pips are set (getField(int pips) has never been successfully invoked)
+		public void finish() throws IllegalStateException {
+			if(field == null || pips == null) {
+				throw new IllegalStateException("method getField(int pips) has never been successfully invoked");
+			}
+			this.played = true;
+		}
 	}
 }

@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import at.yoerg.businesslogic.board.Board;
 import at.yoerg.businesslogic.card.rulecard.RuleCardManager;
+import at.yoerg.businesslogic.game.Game.Turn;
 import at.yoerg.businesslogic.player.Player;
 
 public class GameFactory {

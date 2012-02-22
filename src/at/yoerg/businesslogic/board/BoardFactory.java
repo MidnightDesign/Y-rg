@@ -1,5 +1,6 @@
 package at.yoerg.businesslogic.board;
 
+import java.io.IOException;
 import java.util.List;
 
 public enum BoardFactory {
@@ -12,7 +13,12 @@ public enum BoardFactory {
 	}
 	
 	public Board createRandomBoard(int fieldCount) {
-		return createBoard(FieldManager.getInstance().getRandomFields(fieldCount));
+		try {
+			return createBoard(FieldManager.getInstance().getRandomFields(fieldCount));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 	public Board createBoard(List<Field> fields) {
