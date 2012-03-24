@@ -1,5 +1,7 @@
 package at.yoerg.android.activity;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Timer;
 
 import android.app.Activity;
@@ -9,11 +11,15 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 import at.yoerg.android.R;
+import at.yoerg.android.datastore.SqlPersonStore;
 import at.yoerg.android.player.PlayerListAdapter;
 import at.yoerg.android.player.RemovePlayerButton;
 import at.yoerg.businesslogic.game.Game;
@@ -43,6 +49,8 @@ public class ManagePlayers extends Activity implements OnClickListener {
 		ListAdapter adapter = new PlayerListAdapter(game, this);
 		playerList.setAdapter(adapter);
 		
+		loadPlayers();
+		
 		// For testing
 //		try {
 //			game.addPlayer(Person.create("Rudi"));
@@ -68,14 +76,25 @@ public class ManagePlayers extends Activity implements OnClickListener {
 	}
 	
 	private void addPlayer(String name) {
-		Person player = Person.create(name);
+		Person person = Person.create(name);
 		try {
-			game.addPlayer(player);
+			game.addPlayer(person);
+			SqlPersonStore ps = new SqlPersonStore(this);
+			ps.savePerson(person);
 			EditText t = (EditText) findViewById(R.id.inputPlayerName);
 			t.setText("");
 			refreshList();
 		} catch (PlayerNameExistsException e) {
 			message(getString(R.string.error_player_name_exists, name));
+		}
+	}
+	
+	public void loadPlayers() {
+		SqlPersonStore ps = new SqlPersonStore(this);
+		ArrayList<Person> players = ps.getPeople();
+		Iterator<Person> it = players.iterator();
+		while(it.hasNext()) {
+			addPlayer(it.next().getName());
 		}
 	}
 	
